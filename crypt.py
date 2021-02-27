@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 from utils import polyadd, polymul
 from keygen import gen_normal_poly, gen_binary_poly
@@ -17,6 +18,7 @@ def encrypt(pk, size, q, t, poly_mod, pt):
         Tuple representing a ciphertext.      
     """
     # encode the integer into a plaintext polynomial
+    s_time = time.time()
     m = np.array([pt] + [0] * (size - 1), dtype=np.int64) % t
     delta = q // t
     scaled_m = delta * m  % q
@@ -33,6 +35,8 @@ def encrypt(pk, size, q, t, poly_mod, pt):
             polymul(pk[1], u, q, poly_mod),
             e2, q, poly_mod
         )
+    cost = (time.time() - s_time) * 1000
+    print("encrypt cost %sms" % cost)
     return (ct0, ct1)
 
 def decrypt(sk, size, q, t, poly_mod, ct):
@@ -47,9 +51,13 @@ def decrypt(sk, size, q, t, poly_mod, ct):
     Returns:
         Integer representing the plaintext.
     """
+    s_time = time.time()
     scaled_pt = polyadd(
             polymul(ct[1], sk, q, poly_mod),
             ct[0], q, poly_mod
         )
     decrypted_poly = np.round(scaled_pt * t / q) % t
+    cost = (time.time() - s_time) * 1000
+    print("encrypt cost %sms" % cost)
+
     return int(decrypted_poly[0])

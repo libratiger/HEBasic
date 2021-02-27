@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 from utils import polyadd, polymul
 
@@ -41,11 +42,14 @@ def gen_normal_poly(size):
 
 
 def keygen(size, modulus, poly_mod):
+    s_time = time.time()
     sk = gen_binary_poly(size)
     a = gen_uniform_poly(size, modulus)
     e = gen_normal_poly(size)
     b = polyadd(polymul(-a, sk, modulus, poly_mod), -e, modulus, poly_mod)
 
+    cost = (time.time() - s_time) * 1000
+    print("keygen cost %sms" % cost)
 
     # TODO: wray as class for public key & secret key
     return (b, a), sk
